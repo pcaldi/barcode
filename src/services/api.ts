@@ -16,6 +16,12 @@ const data = [
     price: 'R$ 2,95',
     code: '7898419152273',
     image: "https://res.cloudinary.com/dydeznt3c/image/upload/t_grafite/grafite_pentel_05mm.jpg",
+  },
+  {
+    name: 'Borracha Staedtler',
+    price: 'R$ 5,90',
+    code: '4007817504598',
+    image: "https://res.cloudinary.com/dydeznt3c/image/upload/v1703531413/fjs7gmq1oeok8qkad7uc.png",
   }
 ];
 
