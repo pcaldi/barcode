@@ -1,19 +1,33 @@
 import { useEffect, useState } from "react";
+import { Audio } from 'expo-av';
 import { BarCodeScanner } from "expo-barcode-scanner";
-
 
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { IProduct, findProductByCode } from '../services/api'
 import { styles } from './styles'
 
-import { useAudio } from "../hook/useAudio";
+
 
 export function Screen() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [scanning, setScanning] = useState(false);
   const [products, setProducts] = useState<IProduct | null | undefined>(null);
-  const { playAudio } = useAudio();
+  const [sound, setSound] = useState<Audio.Sound | null>(null);
 
+
+
+  async function playAudio() {
+    try {
+      const { sound: newSound } = await Audio.Sound.createAsync(
+        require('../assets/market-beep.mp3'),
+        { shouldPlay: true, volume: 1.0 },
+      );
+      setSound(newSound);
+      await newSound.playAsync();
+    } catch (error) {
+      console.error('Erro ao reproduzir o som de beep', error);
+    }
+  }
 
 
   useEffect(() => {
@@ -27,7 +41,6 @@ export function Screen() {
 
 
 
-
   function onBarCodeScanned(payload: { data: string }) {
     // consultar o código de barras na API
     const product = findProductByCode(payload.data);
@@ -35,13 +48,12 @@ export function Screen() {
     // após o retorno da API salvar o produto em um estado.
     setProducts(product);
 
-    // Se já leu o produto e pode fechar o scanner
+    // Se já leu o produto, pode fechar o scanner
     setScanning(false);
 
-    // Reproduzir o som de beep somente se um produto for encontrado
-    if (product) {
-      playAudio()
-    }
+    // Reproduzir o som de beep
+    playAudio()
+
   }
 
   if (hasPermission === null) {
@@ -55,8 +67,8 @@ export function Screen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Easy Barcode Scanner!</Text>
-      <Text style={styles.subtitle}>Encontre o preço dos items que você precisa </Text>
+      <Text style={styles.title}>Barcode Scanner!</Text>
+      <Text style={styles.subtitle}>Encontre o preço dos items que você precisa. </Text>
 
       {products === undefined && (
         <Text style={styles.subtitle}>Produto não encontrado... </Text>)}
@@ -80,7 +92,7 @@ export function Screen() {
       {scanning && (
         <BarCodeScanner
           onBarCodeScanned={onBarCodeScanned}
-          style={{ height: 300, width: '100%' }}
+          style={{ height: 350, width: '100%' }}
         />
       )}
 
